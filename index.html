@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英文單字與句型書寫練習</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .input-field {
+            margin: 10px 0;
+        }
+        .button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .result {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>英文單字與句型書寫練習</h1>
+        <div class="input-field">
+            <label for="word">請輸入單字:</label>
+            <input type="text" id="word" placeholder="例如: Apple" required>
+        </div>
+        <div class="input-field">
+            <label for="sentence">請輸入句型:</label>
+            <input type="text" id="sentence" placeholder="例如: I like apples." required>
+        </div>
+        <button class="button" onclick="checkAnswers()">完成練習</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function checkAnswers() {
+            const word = document.getElementById('word').value.trim();
+            const sentence = document.getElementById('sentence').value.trim();
+            const correctWord = "apple";  // 正確的單字
+            const correctSentence = "I like apples.";  // 正確的句型
+
+            let score = 0;
+
+            if (word.toLowerCase() === correctWord) {
+                score += 50;  // 單字得分
+            }
+            if (sentence.toLowerCase() === correctSentence.toLowerCase()) {
+                score += 50;  // 句型得分
+            }
+
+            document.getElementById('result').innerText = `你的分數: ${score}/100`;
+        }
+    </script>
+</body>
+</html>
