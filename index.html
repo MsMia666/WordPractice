@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>英文單字與句型書寫練習</title>
+    <title>英文單字書寫練習</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,8 +21,12 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        .input-field {
-            margin: 10px 0;
+        #canvas {
+            border: 1px solid #ccc;
+            width: 100%;
+            height: 300px;
+            touch-action: none; /* 防止觸控滾動 */
+            position: relative;
         }
         .button {
             display: block;
@@ -38,41 +42,115 @@
             text-align: center;
             margin-top: 20px;
         }
+        .word-list {
+            margin: 10px 0;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>英文單字與句型書寫練習</h1>
-        <div class="input-field">
-            <label for="word">請輸入單字:</label>
-            <input type="text" id="word" placeholder="例如: Apple" required>
+        <h1>英文單字書寫練習</h1>
+        <div class="word-list">
+            <div>單字: <span id="word">apple</span></div>
+            <div>句型: <span id="sentence">I like apples.</span></div>
         </div>
-        <div class="input-field">
-            <label for="sentence">請輸入句型:</label>
-            <input type="text" id="sentence" placeholder="例如: I like apples." required>
-        </div>
-        <button class="button" onclick="checkAnswers()">完成練習</button>
+        <canvas id="canvas"></canvas>
+        <button class="button" onclick="clearCanvas()">清除</button>
         <div class="result" id="result"></div>
     </div>
 
     <script>
-        function checkAnswers() {
-            const word = document.getElementById('word').value.trim();
-            const sentence = document.getElementById('sentence').value.trim();
-            const correctWord = "apple";  // 正確的單字
-            const correctSentence = "I like apples.";  // 正確的句型
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
 
-            let score = 0;
+        const words = [
+            { word: "apple", sentence: "I like apples." },
+            { word: "banana", sentence: "I like bananas." },
+            { word: "orange", sentence: "I like oranges." }
+        ];
+        
+        let currentIndex = 0;
 
-            if (word.toLowerCase() === correctWord) {
-                score += 50;  // 單字得分
-            }
-            if (sentence.toLowerCase() === correctSentence.toLowerCase()) {
-                score += 50;  // 句型得分
-            }
-
-            document.getElementById('result').innerText = `你的分數: ${score}/100`;
+        // 調整canvas大小
+        function resizeCanvas() {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            drawGrid();
         }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // 繪製格線
+        function drawGrid() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+
+            const gridSize = 30; // 格線大小
+            for (let x = 0; x <= canvas.width; x += gridSize) {
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+            }
+            for (let y = 0; y <= canvas.height; y += gridSize) {
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+            }
+            ctx.stroke();
+            drawCurrentWord();
+        }
+
+        // 畫當前單字
+        function drawCurrentWord() {
+            ctx.font = '16px Arial';
+            ctx.fillStyle = 'black';
+            ctx.fillText(`單字: ${words[currentIndex].word}`, 10, 20);
+            ctx.fillText(`句型: ${words[currentIndex].sentence}`, 10, 50);
+        }
+
+        // 開始繪製
+        canvas.addEventListener('touchstart', (e) => {
+            drawing = true;
+            ctx.beginPath();
+            const rect = canvas.getBoundingClientRect();
+            ctx.moveTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+            e.preventDefault(); // 防止滾動
+        });
+
+        // 繪製
+        canvas.addEventListener('touchmove', (e) => {
+            if (drawing) {
+                const rect = canvas.getBoundingClientRect();
+                ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+                ctx.stroke();
+            }
+            e.preventDefault(); // 防止滾動
+        });
+
+        // 結束繪製
+        canvas.addEventListener('touchend', () => {
+            drawing = false;
+            ctx.closePath();
+        });
+
+        // 清除畫布
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawGrid();
+            document.getElementById('result').innerText = '';
+        }
+
+        // 顯示下一個單字
+        function nextWord() {
+            currentIndex = (currentIndex + 1) % words.length;
+            clearCanvas();
+            document.getElementById('word').innerText = words[currentIndex].word;
+            document.getElementById('sentence').innerText = words[currentIndex].sentence;
+        }
+
+        // 每次清除畫布後可呼叫 nextWord()
+        document.getElementById('canvas').addEventListener('touchend', nextWord);
     </script>
 </body>
 </html>
